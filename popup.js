@@ -1,36 +1,48 @@
+var onReddit = false;
+var notOnReddit = true;
+var start;// = new Date().getTime() / 1000;
+chrome.storage.local.set({'counter':0});
 
-// alert("entering....\n")
-// console.log('Successdedwedwedewdewdwedw\nerfgerffede');
-// var start = new Date().getTime();
-// window.onbeforeunload = function(e){
-// 	console.log(e);
-//   //alert("Leaving....\n")
-//  //alert("Leaving....\n")
-//  var elapsed = new Date().getTime() - start;
-//  console.log("You spent "+(elapsed/1000));
-
-//   return elapsed;
-//  // return 'Are you sure you want to leave?';
-// };
-// //});
-// chrome.tabs.onActivated.addListener(function (o){
-// 	console.log("hello");
-// });
-console.log("hello");
-// chrome.tabs.getAllInWindow(null, function(tabs){
-// 	for (var i = 0; i < tabs.length; i++) {
-// 		 console.log(tabs[i]);
-// 		//chrome.tabs.sendRequest(tabs[i].id, { action: "xxx" });                         
-// 	}
-// });
-// chrome.tabs.onCreated.addListener(function(tab) {         
-//    alert(tab.url);
-//    //insertDictionaryScript();
-// });
-var start = new Date().getTime() / 1000;
-function getURL(t){
-	if(t.url.includes("reddit")==false){
-		alert("You changed to something that isn't reddit!")
+function saveData(data){
+	chrome.storage.local.get('counter', function(items){
+    //  items = [ { "phasersTo": "awesome" } ]
+    	console.log(items.counter);	
+    	var ndata = data + items.counter;
+    	chrome.storage.local.set({'counter': ndata}, function() {
+       // Notify that we saved.
+       		console.log(ndata);
+       		alert(ndata);
+       //message('Settings saved');
+    	});
+	});
+	
+}
+function getURL(tab){
+	if(tab.url.includes("reddit")==false){
+		if(onReddit==true){
+			onReddit = false;
+			notOnReddit = true;
+			// save the time
+			var endTime = new Date().getTime() - start;
+			alert("About to store "+ endTime);
+			saveData(endTime);
+			//alert("You have dis-continued your reddit use!");
+		}
+		else if(notOnReddit==true){
+			//nothing to do
+		//	alert("You have switched to notOnReddit from a different tab!")
+		}
+	}else{
+		if(onReddit==true){
+			// nothing to do
+			//alert("You have continued your reddit use!");
+		}else{
+			notOnReddit = false;
+			onReddit = true;
+			// start the timer
+			start = new Date().getTime();
+			//alert("You have arrived at Reddit from a different tab!")
+		}
 	}
 }
 function handleActivated(activeInfo) {
@@ -38,14 +50,29 @@ function handleActivated(activeInfo) {
 }
 function tabUpdated(tabId, changeInfo,tab){
 	if(changeInfo.url.includes("reddit")==false){
-		alert("You changed the URL!");
+		if(onReddit==true){
+			onReddit = false;
+			notOnReddit = true;
+			// save the timer
+			alert("You changed the URL on this tab!");
+		}else{
+			alert("You have changed from notOnReddit to notOnReddit!");
+		}
+	}else{
+		if(onReddit==true){
+			// nothing to do
+			alert("From onReddit to onReddit!")
+		}else{
+			notOnReddit = false;
+			onReddit = true;
+			// start the timer
+			alert("From notOnReddit to onReddit!");
+		}
 	}
 }
+/* If the user switches to a new tab, we will check if it has reddit opened*/
 chrome.tabs.onActivated.addListener(handleActivated);
-chrome.tabs.onUpdated.addListener(tabUpdated);
 
-	//aler
-// chrome.tabs.query({"active": true, "currentWindow": true}, function (tabs) {
-//     tabURL = tabs;
-//     console.log( tabURL);
-// });
+/* If the user goes to a new webpage from the same tab, we will check
+ if is under the reddit domain */
+chrome.tabs.onUpdated.addListener(tabUpdated);

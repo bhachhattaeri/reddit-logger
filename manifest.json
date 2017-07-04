@@ -10,7 +10,8 @@
   },
   "permissions": [
    "tabs",
-   "activeTab"
+   "activeTab",
+   "storage"
    ],
   "background": {
     "scripts": ["popup.js"]
