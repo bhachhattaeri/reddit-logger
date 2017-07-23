@@ -5,14 +5,9 @@ chrome.storage.local.set({'counter':0});
 var dat = 0;
 function saveData(data){
 	chrome.storage.local.get('counter', function(items){
-    //  items = [ { "phasersTo": "awesome" } ]
     	console.log(items.counter);	
     	var ndata = data + items.counter;
     	chrome.storage.local.set({'counter': ndata}, function() {
-       	//	console.log(ndata);
-       //	K = 2;
-			//alert(ndata);
-
       	});
 	});
 	
@@ -22,26 +17,17 @@ function getURL(tab){
 		if(onReddit==true){
 			onReddit = false;
 			notOnReddit = true;
-			// save the time
 			var endTime = new Date().getTime() - start;
-			//alert("About to store "+ endTime);
-			saveData(endTime);
-			//alert("You have dis-continued your reddit use!");
+			saveData(endTime/(1000));
 		}
 		else if(notOnReddit==true){
-			//nothing to do
-		//	alert("You have switched to notOnReddit from a different tab!")
 		}
 	}else{
 		if(onReddit==true){
-			// nothing to do
-			//alert("You have continued your reddit use!");
 		}else{
 			notOnReddit = false;
 			onReddit = true;
-			// start the timer
 			start = new Date().getTime();
-			//alert("You have arrived at Reddit from a different tab!")
 		}
 	}
 }
@@ -56,7 +42,7 @@ function tabUpdated(tabId, changeInfo,tab){
 			// save the timer
 			var endTime = new Date().getTime() - start;
 			//alert("About to store "+ endTime);
-			saveData(endTime);
+			saveData(endTime/(1000));
 			//alert("You changed the URL on this tab!");
 		}else{
 		//	alert("You have changed from notOnReddit to notOnReddit!");
